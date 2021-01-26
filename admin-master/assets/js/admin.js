@@ -60,7 +60,7 @@ $(document).ready(()=>{
             data:{action:'fetch_countries'},
             success:(res)=>{
                 $('#showNote').html(res)
-                $('table').DataTable()
+                
                 $("#loaderCountry").hide();
             }
         })
@@ -198,7 +198,7 @@ $(document).ready(()=>{
             data:{action:'fetch_posts'},
             success:(res)=>{
                 $('#showPost').html(res)
-                $('table').DataTable()
+                
                 $("#loaderPost").hide();
             }
         })
@@ -293,7 +293,7 @@ $(document).ready(()=>{
             data:{action:'fetch_contacts'},
             success:(res)=>{
                 $('#showContact').html(res)
-                $('table').DataTable()
+                
                 $("#loaderContact").hide();
             }
         })
