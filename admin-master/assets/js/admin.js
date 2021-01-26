@@ -39,7 +39,7 @@ $(document).ready(()=>{
                         icon:"success",
                         
                     }).then(function(){
-                        window.location.replace("/travelweb/admin-master/admin_country.php")
+                        window.location.replace("../admin-master/admin_country.php")
                     })
                     fetchNotes()
                    
@@ -105,7 +105,7 @@ $(document).ready(()=>{
                         title:'Country Updated Successfully',
                         icon:"success",
                     }).then(function(){
-                        window.location.replace("/travelweb/admin-master/admin_country.php")
+                        window.location.replace("../admin-master/admin_country.php")
                     })
                     fetchNotes()
                     
@@ -181,7 +181,7 @@ $(document).ready(()=>{
                         title:'Post Added Successfully',
                         icon:"success",
                     }).then(function(){
-                        window.location.replace("/travelweb/admin-master/admin_post.php")
+                        window.location.replace("../admin-master/admin_post.php")
                     })
                     fetchPosts()
                 }
@@ -237,7 +237,7 @@ $(document).ready(()=>{
                         title:'Post Updated Successfully',
                         icon:"success",
                     }).then(function(){
-                        window.location.replace("/travelweb/admin-master/admin_post.php")
+                        window.location.replace("../admin-master/admin_post.php")
                     })
                  
                     fetchPosts()
