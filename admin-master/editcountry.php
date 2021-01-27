@@ -1,6 +1,6 @@
 <?php
     require_once "inc/header.php";
-    require_once "inc/config.php";
+    require_once "../inc/config.php";
     if(isset($_GET['country_id'])){
         $id = $_GET['country_id'];
         $sql = "SELECT * FROM country WHERE id = ?";

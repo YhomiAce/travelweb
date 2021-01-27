@@ -1,47 +1,41 @@
 <?php
     session_start();
+
     require_once "../inc/config.php";
-
-    if(isset($_SESSION['user'])){
-        header('Location:dashboard.php');
-    }
-    $msg="";
-
-    if(isset($_POST['login'])){
-        $username = htmlspecialchars($_POST['email']);
+    $msg = "";
+    if(isset($_POST['signup'])){
+        $name = htmlspecialchars($_POST['name']);
+        $email = htmlspecialchars($_POST['email']);
         $password = htmlspecialchars($_POST['password']);
-        if(empty($username) && empty($password)){
+        $cpass = htmlspecialchars($_POST['cpassword']);
+        $role = 0;
+        $hashPwd = password_hash($password,PASSWORD_BCRYPT);
+        $sql = "SELECT * FROM auth WHERE email = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$email]);
+        $row = $stmt->fetch();
+        if(empty($name) && empty($email) && empty($password) && empty($cpass)){
             $msg = "Please fill all fields";
         }else{
-            if(!filter_var($username,FILTER_VALIDATE_EMAIL)){
-                $msg = "Please use a valid Email";
+            if($password != $cpass){
+                $msg = "Passwords does not match";
             }else{
-                $sql = "SELECT * FROM auth WHERE email = ?";
-                $stmt = $conn->prepare($sql);
-                $stmt->execute([$username]);
-                $row = $stmt->fetch();
-                if(!$row){
-                    $msg = "This Email is not registered";
+                if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+                    $msg = "please use a valid Email";
                 }else{
-                    if(!password_verify($password,$row['password'])){
-                        $msg = "Password is Incorrect";
+                    if($row){
+                        $msg = "Email already exist. Use another Email to register";
                     }else{
-                        if(!empty($_POST['remember'])){
-                            setcookie('email',$username,time()+(30*24*60*60),'/');
-                            setcookie('password',$password,time()+(30*24*60*60),'/');
-                        }else{
-                            setcookie('email','',1,'/');
-                            setcookie('password','',1,'/');
-                        }
-                        $_SESSION['user'] = $username;
+                        $db = "INSERT INTO auth(email,password,role,name) VALUES(:email,:password,:role,:name)";
+                        $save = $conn->prepare($db);
+                        $save->execute(['email'=>$email,'password'=>$hashPwd,'role'=>$role,'name'=>$name]);
+                        $_SESSION['user'] = $email;
                         header('Location:dashboard.php');
                     }
                 }
             }
         }
     }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -64,8 +58,7 @@
     <meta name="author" content="CodedThemes">
     <!-- Favicon icon -->
     <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
-    <!-- Google font-->
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,800" rel="stylesheet">
+    <!-- Google font--><link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,800" rel="stylesheet">
     <!-- Required Fremwork -->
     <link rel="stylesheet" type="text/css" href="assets/css/bootstrap/css/bootstrap.min.css">
     <!-- themify-icons line icon -->
@@ -95,15 +88,13 @@
     </div>
 </div>
     <!-- Pre-loader end -->
-
     <section class="login p-fixed d-flex text-center bg-primary common-img-bg">
         <!-- Container-fluid starts -->
-        <div class="container">
+        <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-12">
                     <!-- Authentication card start -->
-                    <div class="login-card card-block auth-body mr-auto ml-auto">
-                    
+                    <div class="signup-card card-block auth-body mr-auto ml-auto">
                         <form class="md-float-material" method="POST" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                             <?php if($msg !=""): ?>
                                 <div class="alert alert-danger"><?php echo $msg; ?> </div>
@@ -115,39 +106,30 @@
                             <div class="auth-box">
                                 <div class="row m-b-20">
                                     <div class="col-md-12">
-                                        <h3 class="text-left txt-primary">Sign In</h3>
+                                        <h3 class="text-center txt-primary">Sign up. It is fast and easy.</h3>
                                     </div>
                                 </div>
                                 <hr/>
                                 <div class="input-group">
-                                    <input type="email" class="form-control"
-                                     name="email" placeholder="Your Email Address"
-                                     value="<?php if(isset($_COOKIE['email'])){echo $_COOKIE['email']; }?>" required>
+                                    <input type="text" class="form-control" name="name" placeholder="Choose Username" required>
                                     <span class="md-line"></span>
                                 </div>
                                 <div class="input-group">
-                                    <input type="password" class="form-control"
-                                     name="password" placeholder="Password"
-                                     value="<?php if(isset($_COOKIE['password'])){echo $_COOKIE['password']; }?>" required>
+                                    <input type="text" class="form-control" name="email" placeholder="Your Email Address" required>
                                     <span class="md-line"></span>
                                 </div>
-                                <div class="row m-t-25 text-left">
-                                    <div class="col-sm-7 col-xs-12">
-                                        <div class="checkbox-fade fade-in-primary">
-                                            <label>
-                                                <input type="checkbox" name="remember" <?php if(isset($_COOKIE['email'])){ ?> checked <?php } ?>>
-                                                <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
-                                                <span class="text-inverse">Remember me</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-5 col-xs-12 forgot-phone text-right">
-                                        <a href="auth-reset-password.html" class="text-right f-w-600 text-inverse"> Forgot Your Password?</a>
-                                    </div>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" name="password" placeholder="Choose Password" required>
+                                    <span class="md-line"></span>
                                 </div>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" name="cpassword" placeholder="Confirm Password" required>
+                                    <span class="md-line"></span>
+                                </div>
+                                
                                 <div class="row m-t-30">
                                     <div class="col-md-12">
-                                        <button type="submit" name="login" class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20">Sign in</button>
+                                        <button type="submit" name="signup" class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20">Sign up now.</button>
                                     </div>
                                 </div>
                                 <hr/>
@@ -160,7 +142,6 @@
                                         <img src="assets/images/auth/Logo-small-bottom.png" alt="small-logo.png">
                                     </div>
                                 </div>
-
                             </div>
                         </form>
                         <!-- end of form -->
@@ -173,6 +154,7 @@
         </div>
         <!-- end of container-fluid -->
     </section>
+	
     <!-- Warning Section Starts -->
     <!-- Older IE warning message -->
     <!--[if lt IE 9]>

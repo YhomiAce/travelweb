@@ -1,6 +1,6 @@
 <?php
     require_once "inc/header.php";
-    require_once "inc/config.php";
+    require_once "../inc/config.php";
     $results_per_page = 7;
     $sql = "SELECT * FROM country";
     $stmt = $conn->prepare($sql);
