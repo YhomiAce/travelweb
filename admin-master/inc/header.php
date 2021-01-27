@@ -1,3 +1,14 @@
+<?php
+     session_start();
+    require_once "../inc/config.php";
+    $email = $_SESSION['user'];
+    $sql = "SELECT * FROM auth WHERE email = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$email]);
+    $row = $stmt->fetch();
+   
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -121,7 +132,7 @@
                                         <div class="media">
                                             <img class="d-flex align-self-center img-radius" src="assets/images/avatar-4.jpg" alt="Generic placeholder image">
                                             <div class="media-body">
-                                                <h5 class="notification-user">John Doe</h5>
+                                                <h5 class="notification-user"><?= $row['name'];?></h5>
                                                 <p class="notification-msg">Lorem ipsum dolor sit amet, consectetuer elit.</p>
                                                 <span class="notification-time">30 minutes ago</span>
                                             </div>
@@ -152,7 +163,7 @@
                             <li class="user-profile header-notification">
                                 <a href="#!">
                                     <img src="assets/images/avatar-4.jpg" class="img-radius" alt="User-Profile-Image">
-                                    <span>John Doe</span>
+                                    <span><?= $row['name'];?></span>
                                     <i class="ti-angle-down"></i>
                                 </a>
                                 <ul class="show-notification profile-notification">
